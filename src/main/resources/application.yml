@@ -1,0 +1,24 @@
+server:
+  port: 8080
+  servlet: 
+    context-path: /demo
+    session:
+      timeout: 30
+
+spring:
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    driver-class-name: org.postgresql.Driver
+    username: root
+    password: root
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 20
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
+    show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
