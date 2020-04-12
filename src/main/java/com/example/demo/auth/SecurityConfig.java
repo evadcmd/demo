@@ -1,7 +1,6 @@
 package com.example.demo.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,6 +17,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final String ENTRY_URL = "/";
     public static final String LOGIN_URL = "/login";
+    public static final String LOGOUT_URL = "/logout";
     public static final String CSS_URL = "/css/**";
     public static final String JS_URL = "/js/**";
 
@@ -38,7 +38,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthenticationFailureHandler failureHandler;
 
-    @Bean
     protected CustomAuthFilter customAuthFilter() throws Exception {
         CustomAuthFilter customAuthFilter = new CustomAuthFilter();
         customAuthFilter.setAuthenticationSuccessHandler(successHandler);
