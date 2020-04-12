@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 public class AuthConfig {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Bean
     UserDetailsService userDetailsService() {
