@@ -18,8 +18,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String ENTRY_URL = "/";
     public static final String LOGIN_URL = "/login";
     public static final String LOGOUT_URL = "/logout";
+    /*
     public static final String CSS_URL = "/css/**";
     public static final String JS_URL = "/js/**";
+    */
+    public static final String APP_URL = "/app/**";
 
 
     @Autowired
@@ -48,22 +51,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf()
+        http.csrf().disable();
+            /*
             .csrfTokenRepository(new HttpSessionCsrfTokenRepository())
             .ignoringAntMatchers(ENTRY_URL)
             .ignoringAntMatchers(CSS_URL)
             .ignoringAntMatchers(JS_URL);
+            */
 
         http.authorizeRequests()
-            .antMatchers(ENTRY_URL).permitAll()
+            .antMatchers(APP_URL).authenticated()
+            .anyRequest().permitAll();
+            /*
             .antMatchers(CSS_URL).permitAll()
             .antMatchers(JS_URL).permitAll()
             .anyRequest().authenticated();
+            */
 
         http.addFilterAt(customAuthFilter(), UsernamePasswordAuthenticationFilter.class)
             .formLogin()
-            .loginPage(ENTRY_URL).permitAll()
+            //.loginPage(ENTRY_URL).permitAll()
             .loginProcessingUrl(LOGIN_URL);
-        
+
+        http.logout()
+            .logoutUrl(LOGIN_URL)
+            .deleteCookies("JSESSIONID")
+            .deleteCookies("isAuthenticated")
+            .deleteCookies("displayname")
+            .deleteCookies("authories")
+            .invalidateHttpSession(true);
     }
 }

@@ -3,6 +3,7 @@ package com.example.demo.auth;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +22,12 @@ public class Resp {
 
     public Resp setStatus(int sc) {
         resp.setStatus(sc);
+        return this;
+    }
+
+    public Resp addCookie(Cookie cookie, int maxAge) {
+        cookie.setMaxAge(maxAge * 60);
+        resp.addCookie(cookie);
         return this;
     }
 
