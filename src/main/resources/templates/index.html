@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewpoint" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="context-path" th:content="${#httpServletRequest.getContextPath()}">
+    <link rel="stylesheet" th:ref="@{/css/bootstap.min.css}" />
+    <link rel="stylesheet" th:ref="@{/css/main.css}" />
+    <title>springboot demo</title>
+</head>
+<body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <scirpt th:src="@{/js/bundle.js}"></scirpt>
+</body>
+</html>

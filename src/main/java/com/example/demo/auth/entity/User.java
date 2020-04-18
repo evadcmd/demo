@@ -28,7 +28,7 @@ public class User implements UserDetails {
     @Id
     private String username;
     private String password;
-    private String displayName;
+    private String displayname;
     private boolean enabled;
     private boolean credentialsNonExpired;
     private boolean accountNonExpired;
