@@ -11,11 +11,13 @@ import javax.persistence.ManyToMany;
 import org.springframework.security.core.GrantedAuthority;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 public class Auth implements GrantedAuthority {
     /**
      *
@@ -31,4 +33,8 @@ public class Auth implements GrantedAuthority {
         inverseJoinColumns = @JoinColumn(name = "username")
     )
     private Set<User> users;
+
+    public Auth(String authority) {
+        this.authority = authority;
+    }
 }
