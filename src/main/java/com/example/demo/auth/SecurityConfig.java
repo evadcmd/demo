@@ -22,7 +22,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String CSS_URL = "/css/**";
     public static final String JS_URL = "/js/**";
     */
-    public static final String APP_URL = "/app/**";
+    public static final String API_URL = "/api/**";
 
 
     @Autowired
@@ -32,7 +32,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService)
             .passwordEncoder(NoOpPasswordEncoder.getInstance());
-
     }
 
     @Autowired
@@ -60,8 +59,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             */
 
         http.authorizeRequests()
-            .antMatchers(APP_URL).authenticated()
+            .antMatchers(API_URL).authenticated()
             .anyRequest().permitAll();
+            //.antMatchers("/**").permitAll();
             /*
             .antMatchers(CSS_URL).permitAll()
             .antMatchers(JS_URL).permitAll()
@@ -70,11 +70,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.addFilterAt(customAuthFilter(), UsernamePasswordAuthenticationFilter.class)
             .formLogin()
-            //.loginPage(ENTRY_URL).permitAll()
+            .loginPage(ENTRY_URL).permitAll()
             .loginProcessingUrl(LOGIN_URL);
 
         http.logout()
-            .logoutUrl(LOGIN_URL)
+            .logoutUrl(LOGOUT_URL)
             .deleteCookies("JSESSIONID")
             .deleteCookies("isAuthenticated")
             .deleteCookies("displayname")

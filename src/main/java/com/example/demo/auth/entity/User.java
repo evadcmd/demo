@@ -1,9 +1,9 @@
 package com.example.demo.auth.entity;
 
-import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -12,12 +12,18 @@ import javax.persistence.Table;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "demo_user")
 public class User implements UserDetails {
     /**
@@ -29,12 +35,12 @@ public class User implements UserDetails {
     private String username;
     private String password;
     private String displayname;
-    private boolean enabled;
-    private boolean credentialsNonExpired;
-    private boolean accountNonExpired;
-    private boolean accountNonLocked;
+    private boolean enabled = true;
+    private boolean credentialsNonExpired = true;
+    private boolean accountNonExpired = true;
+    private boolean accountNonLocked = true;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_auth",
         joinColumns = @JoinColumn(name="username"),
         inverseJoinColumns = @JoinColumn(name = "authority")

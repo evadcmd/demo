@@ -13,7 +13,6 @@ import com.example.demo.auth.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
@@ -42,7 +41,7 @@ public class AuthConfig {
     UserDetailsService userDetailsService() {
         return (username) -> {
             return userRepository.findById(username).orElseThrow(
-                () -> { return new UsernameNotFoundException("username not found."); }
+                () -> { return new UsernameNotFoundException(String.format("username: %s not found.", username)); }
             );
         };
     }
