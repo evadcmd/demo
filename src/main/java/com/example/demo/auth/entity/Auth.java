@@ -19,7 +19,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Setter
 @NoArgsConstructor
 public class Auth implements GrantedAuthority {
     /**
