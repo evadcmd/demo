@@ -33,3 +33,6 @@ out/
 .vscode/
 
 .DS_Store
+
+### react app js ###
+/src/main/resources/static/js/bundle.js

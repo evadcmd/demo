@@ -1,7 +1,16 @@
 #root {
     width: 100vw;
     height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+}
+
+main {
+    height: 100%;
+    width: 100%;
+}
+
+main > aside {
+    height: 100%;
+    width: 160px;
+    background-color: #f8f9fa;
+    overflow-y: scroll;
 }

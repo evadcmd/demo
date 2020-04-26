@@ -21,24 +21,28 @@ public class Initializer implements CommandLineRunner {
     @Autowired
     private UserRepository userRepository;
     
+    @Override
     public void run(String... args) {
+        // default authorities
         Auth admin = Auth.of(Auth.Role.ROLE_ADMIN);
         Auth manager = Auth.of(Auth.Role.ROLE_MANAGER);
         Auth user = Auth.of(Auth.Role.ROLE_USER);
 
         authRepository.saveAll(List.of(admin, manager, user));
 
-        userRepository.saveAll(List.of(
-            User.builder()
-                .username("root")
-                .password("root")
-                .displayname("root")
-                .authorities(Set.of(admin))
-                .enabled(true)
-                .accountNonExpired(true)
-                .accountNonLocked(true)
-                .credentialsNonExpired(true)
-                .build()
-        ));
+        if (!userRepository.findByEmail("evadcmd@gmail.com").isPresent()) {
+            userRepository.save(
+                User.builder()
+                    .username("root")
+                    .password("root")
+                    .email("evadcmd@gmail.com")
+                    .authorities(Set.of(admin))
+                    .enabled(true)
+                    .accountNonExpired(true)
+                    .accountNonLocked(true)
+                    .credentialsNonExpired(true)
+                    .build()
+            );
+        }
     }
 }

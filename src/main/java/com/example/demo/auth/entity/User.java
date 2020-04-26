@@ -2,8 +2,10 @@ package com.example.demo.auth.entity;
 
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -32,9 +34,12 @@ public class User implements UserDetails {
     private static final long serialVersionUID = 1L;
 
     @Id
+    @GeneratedValue
+    private Integer id;
+    @Column(unique = true)
+    private String email;
     private String username;
     private String password;
-    private String displayname;
     private boolean enabled = true;
     private boolean credentialsNonExpired = true;
     private boolean accountNonExpired = true;

@@ -39,9 +39,9 @@ public class AuthConfig {
 
     @Bean
     UserDetailsService userDetailsService() {
-        return (username) -> {
-            return userRepository.findById(username).orElseThrow(
-                () -> { return new UsernameNotFoundException(String.format("username: %s not found.", username)); }
+        return (email) -> {
+            return userRepository.findByEmail(email).orElseThrow(
+                () -> { return new UsernameNotFoundException(String.format("email: %s not found.", email)); }
             );
         };
     }
@@ -54,7 +54,7 @@ public class AuthConfig {
             Resp.of(resp)
                 .setStatus(200)
                 .addCookie(new Cookie("isAuthenticated", "true"), timeout)
-                .addCookie(new Cookie("displayname", user.getDisplayname()), timeout)
+                .addCookie(new Cookie("username", user.getUsername()), timeout)
                 .addCookie(new Cookie("authorities", authorities), timeout)
                 .setContentType("application/json;charset=UTF-8")
                 .writeResponseBody(Map.of("authentication", true));
