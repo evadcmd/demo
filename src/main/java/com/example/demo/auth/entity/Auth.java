@@ -3,8 +3,6 @@ package com.example.demo.auth.entity;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -18,6 +16,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 public class Auth implements GrantedAuthority {
@@ -26,18 +26,12 @@ public class Auth implements GrantedAuthority {
      */
     private static final long serialVersionUID = 1L;
 
-    public static enum Role {
-        ROLE_ADMIN, ROLE_MANAGER, ROLE_USER;
-    }
-
-    public static Auth of(Role role) {
+    public static Auth of(String role) {
         return new Auth(role);
     }
 
     @Id
-    @Enumerated(EnumType.STRING)
-    @Setter
-    private Role authority;
+    private String authority;
 
     public String getAuthority() {
         return this.authority.toString();
@@ -53,7 +47,7 @@ public class Auth implements GrantedAuthority {
     )
     private Set<User> users;
 
-    private Auth(Role role) {
+    private Auth(String role) {
         this.authority = role;
     }
 

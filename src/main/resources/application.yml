@@ -8,7 +8,8 @@ server:
 spring:
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/springboot
+    # url: jdbc:postgresql://localhost:5432/springboot
+    url: jdbc:postgresql://db:5432/springboot #　docker用設定
     driver-class-name: org.postgresql.Driver
     username: root
     password: root
@@ -22,3 +23,24 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: update
+
+  quartz:
+    properties:
+      org:
+        quartz:
+          scheduler:
+            overwriteExistingjobs: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: evadcmd@gmail.com
+    password: undefined
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true

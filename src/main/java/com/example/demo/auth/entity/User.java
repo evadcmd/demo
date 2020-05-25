@@ -12,6 +12,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.AllArgsConstructor;
@@ -39,10 +42,25 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String email;
     private String username;
+
+    @JsonIgnore
     private String password;
+    @JsonIgnore
+    public String getPassword() {
+        return this.password;
+    }
+    @JsonProperty
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Builder.Default
     private boolean enabled = true;
+    @Builder.Default
     private boolean credentialsNonExpired = true;
+    @Builder.Default
     private boolean accountNonExpired = true;
+    @Builder.Default
     private boolean accountNonLocked = true;
 
     @ManyToMany(fetch = FetchType.EAGER)
