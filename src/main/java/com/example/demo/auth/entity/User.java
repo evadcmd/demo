@@ -4,15 +4,21 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
 import javax.persistence.Table;
 
+import com.example.demo.app.entity.Camera;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,16 +31,30 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "demo_user")
+@Entity @Table(name = "demo_user")
+@NamedEntityGraphs({
+    @NamedEntityGraph(name = "user-camera",
+        attributeNodes = {
+            @NamedAttributeNode(value = "auth"),
+            @NamedAttributeNode(value = "cameras")
+        }
+    )
+})
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User implements UserDetails {
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
+
+    public static User empty() {
+        return User.builder()
+            .username("")
+            .email("")
+            .password("")
+            .build();
+    }
 
     @Id
     @GeneratedValue
@@ -63,11 +83,17 @@ public class User implements UserDetails {
     @Builder.Default
     private boolean accountNonLocked = true;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_auth",
-        joinColumns = @JoinColumn(name="username"),
-        inverseJoinColumns = @JoinColumn(name = "authority")
-    )
-    private Set<Auth> authorities;
+    @ManyToOne
+    @JoinColumn(name = "auth_id")
+    Auth auth;
 
+    public Set<Auth> getAuthorities() {
+        return Set.of(this.auth);
+    }
+
+    @ManyToMany
+    @JoinTable(name = "user_camera",
+        joinColumns = @JoinColumn(name = "id"),
+        inverseJoinColumns = @JoinColumn(name = "ip"))
+    private Set<Camera> cameras;
 }

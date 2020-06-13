@@ -2,6 +2,7 @@ package com.example.demo.app.util;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.mail.util.ByteArrayDataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -17,12 +18,15 @@ import lombok.Setter;
 public class Mail {
     private static final String templateURI = "mail";
 
+    // JavaMailSenderImpl is thread-safe once it is constructed.
     @Autowired
     private JavaMailSender mailSender;
 
     @Autowired
     private TemplateEngine templateEngine;
 
+    // sender info
+    // read-only: thread-safe
     @Getter
     @Setter
     private String username;
@@ -30,14 +34,24 @@ public class Mail {
     public void sendText(
             String to,
             String subject,
-            String text) throws MessagingException {
+            String text,
+            byte[] img) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setFrom(username);
-        helper.setTo(to);
-        helper.setSubject(subject);
-        helper.setText(text, true);
+        MimeMessageHelper msgHelper = new MimeMessageHelper(message, true);
+        msgHelper.setFrom(username);
+        msgHelper.setTo(to);
+        msgHelper.setSubject(subject);
+        msgHelper.setText(text, true);
+        if (img != null)
+            msgHelper.addAttachment("test.jpeg", new ByteArrayDataSource(img, "image/jpeg"));
         mailSender.send(message);
+    }
+
+    public void sendText(
+            String to,
+            String subject,
+            String text) throws MessagingException {
+        sendText(to, subject, text, null);
     }
 
     public void send(String to) throws Exception {

@@ -1,0 +1,26 @@
+aiservier:
+  ip: 0.0.0.0
+  port: 5353
+  contextpath: /api/camera_detect
+
+rtsp:
+  username: username
+  password: password
+  pattern: rtsp://${rtsp.username}:${rtsp.password}%s/Src/MediaInput/hevb
+
+authorities:
+  - authority: ROLE_ROOT
+    displayname: ルート
+    weight: 4
+  - authority: ROLE_ADMIN
+    displayname: 管理者
+    weight: 2
+  - authority: ROLE_USER
+    displayname: 一般ユーザー
+    weight: 1
+
+root:
+  email: evadcmd@gmail.com
+  password: root
+  username: root
+  enabled: true

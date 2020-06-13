@@ -13,7 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
+public class AuthFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse resp) {
         if (req.getHeader("Content-Type").contains("application/json")) {

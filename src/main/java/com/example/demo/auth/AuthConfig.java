@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.example.demo.auth.entity.User;
 import com.example.demo.auth.entity.Auth;
 import com.example.demo.auth.repository.UserRepository;
+import com.example.demo.auth.util.AuthWeight;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -19,44 +20,58 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import lombok.Getter;
 import lombok.Setter;
 
 @Configuration
 @ConfigurationProperties(prefix = "server.servlet.session")
 public class AuthConfig {
+    private static final String APPLICATION_JSON = "application/json;charset=UTF-8";
 
-    @Getter
     @Setter
     private int timeout;
+
+    @Autowired
+    private AuthWeight authWeight;
 
     @Autowired
     private UserRepository userRepository;
 
     @Bean
+    protected AntPathRequestMatcher antPathRequestMatcher() {
+        return new AntPathRequestMatcher("/api/*");
+    }
+
+    @Bean
+    protected BCryptPasswordEncoder bcryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     UserDetailsService userDetailsService() {
-        return (email) -> {
-            return userRepository.findByEmail(email).orElseThrow(
-                () -> { return new UsernameNotFoundException(String.format("email: %s not found.", email)); }
-            );
-        };
+        return (email) -> (
+            userRepository.findByEmail(email).orElseThrow(
+                () -> new UsernameNotFoundException(String.format("email: %s not found.", email))
+            )
+        );
     }
 
     @Bean
     AuthenticationSuccessHandler authenticationSuccessHandler() {
         return (HttpServletRequest req, HttpServletResponse resp, Authentication auth) -> {
             User user = (User) auth.getPrincipal();
-            String authorities = user.getAuthorities().stream().map(Auth::getAuthority).collect(Collectors.joining(","));
+            Integer weight = user.getAuthorities().stream().mapToInt(authWeight::get).sum();
             Resp.of(resp)
                 .setStatus(200)
                 .addCookie(new Cookie("isAuthenticated", "true"), timeout)
                 .addCookie(new Cookie("username", user.getUsername()), timeout)
-                .addCookie(new Cookie("authorities", authorities), timeout)
-                .setContentType("application/json;charset=UTF-8")
+                .addCookie(new Cookie("authorities", weight.toString()), timeout)
+                .setContentType(APPLICATION_JSON)
                 .writeResponseBody(Map.of("authentication", true));
         };
     }
@@ -69,7 +84,7 @@ public class AuthConfig {
                 .addCookie(new Cookie("isAuthenticated", "false"), 0)
                 .addCookie(new Cookie("displayname", ""), 0)
                 .addCookie(new Cookie("authorities", ""), 0)
-                .setContentType("application/json;charset=UTF-8")
+                .setContentType(APPLICATION_JSON)
                 .writeResponseBody(
                     Map.of(
                         "authentication", false,
@@ -84,7 +99,7 @@ public class AuthConfig {
         return (HttpServletRequest req, HttpServletResponse resp, Authentication auth) -> {
             Resp.of(resp)
                 .setStatus(200)
-                .setContentType("application/json;charset=UTF-8")
+                .setContentType(APPLICATION_JSON)
                 .writeResponseBody(Map.of("authentication", false));
         };
     }

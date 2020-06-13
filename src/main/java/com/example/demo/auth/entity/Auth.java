@@ -4,11 +4,7 @@ import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.OneToMany;
 
 import org.springframework.security.core.GrantedAuthority;
 
@@ -21,34 +17,23 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 public class Auth implements GrantedAuthority {
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
-
-    public static Auth of(String role) {
-        return new Auth(role);
-    }
 
     @Id
     private String authority;
+    private String displayname;
+    private Integer weight;
 
-    public String getAuthority() {
-        return this.authority.toString();
-    }
-
-    @JsonIgnore
-    @Setter
-    @Getter
-    @ManyToMany
-    @JoinTable(name = "user_auth",
-        joinColumns = @JoinColumn(name = "authority"),
-        inverseJoinColumns = @JoinColumn(name = "username")
-    )
+    @OneToMany(mappedBy = "auth")
     private Set<User> users;
 
-    private Auth(String role) {
-        this.authority = role;
+    @Override
+    public int hashCode() {
+        return this.authority.hashCode();
     }
 
+    @Override
+    public boolean equals(Object auth) {
+        return this.authority.equals(((Auth) auth).getAuthority());
+    }
 }

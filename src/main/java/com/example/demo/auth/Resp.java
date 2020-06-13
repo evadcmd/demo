@@ -12,7 +12,7 @@ public class Resp {
 
     HttpServletResponse resp;
 
-    static Resp of(HttpServletResponse resp) {
+    public static final Resp of(HttpServletResponse resp) {
         return new Resp(resp);
     }
 
