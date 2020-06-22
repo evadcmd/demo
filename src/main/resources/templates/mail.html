@@ -147,8 +147,12 @@
     </head>
     <body>
         <div class="alert alert-warning" role="alert">
-            <h3 class="alert-heading">WARNING</h3>
+            <a th:href="${url}" class="alert-link">Info</a>
             <p>[[${username}]]</p>
+            <p>時間: [[${at}]]</p>
+            <p>カメラ: [[${cameraLabel}]]([[${cameraIp}]])</p>
+            <p>人数: [[${numHuman}]]</p>
+            <p>確信度: [[${maxConfidence}]]%</p>
             <a herf="http://127.0.0.1:8080/demo" class="alert-link">Home</a>
         </div>
     </body>

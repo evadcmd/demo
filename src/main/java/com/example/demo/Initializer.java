@@ -8,6 +8,7 @@ import com.example.demo.auth.entity.Auth;
 import com.example.demo.auth.entity.User;
 import com.example.demo.auth.repository.AuthRepository;
 import com.example.demo.auth.repository.UserRepository;
+import com.example.demo.auth.util.RSAUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -52,6 +53,7 @@ public class Initializer implements CommandLineRunner {
                 .username(root.getUsername())
                 .auth(authorities.get(0))
                 .build();
+        // RSAUtils.generateAndShowKeyPair();
         // cache self URL
         ip.getSelfURL();
     }

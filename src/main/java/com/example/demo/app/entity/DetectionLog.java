@@ -59,6 +59,13 @@ public class DetectionLog extends Record {
     private Integer maxConfidence;
 
     @Transient
+    private String cameraLabel;
+    public DetectionLog setCameraLabel(String cameraLabel) {
+        this.cameraLabel = cameraLabel;
+        return this;
+    }
+
+    @Transient
     @Lob
     @Column(columnDefinition = "bytea")
     @Type(type = "org.hibernate.type.BinaryType")

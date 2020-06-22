@@ -56,8 +56,7 @@ public class User implements UserDetails {
             .build();
     }
 
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue
     private Integer id;
     @Column(unique = true)
     private String email;

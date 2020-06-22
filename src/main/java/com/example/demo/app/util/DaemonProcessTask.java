@@ -16,6 +16,7 @@ import com.example.demo.app.dto.HumanDetectionResp;
 import com.example.demo.app.entity.Camera;
 import com.example.demo.app.entity.DetectionLog;
 import com.example.demo.app.repository.CameraRepository;
+import com.example.demo.app.repository.DetectionLogRepository;
 import com.example.demo.auth.entity.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +36,7 @@ public class DaemonProcessTask implements org.quartz.Job {
 
     @Autowired private Mail mail;
     @Autowired private CameraRepository cameraRepository;
+    @Autowired private DetectionLogRepository logRepository;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -42,7 +44,7 @@ public class DaemonProcessTask implements org.quartz.Job {
 
         for (Map.Entry<Integer, Integer> entry : bag.entrySet()) {
             if (entry.getValue() == 0)
-                return;
+                continue;
 
             Integer cameraId = entry.getKey();
             String ip = IP.valueOf(cameraId);
@@ -75,6 +77,9 @@ public class DaemonProcessTask implements org.quartz.Job {
                             return HumanDetectionResp.empty();
                         }
                     })
+                    .exceptionally(e -> {
+                      return HumanDetectionResp.empty();  
+                    })
             );
 
             // join all futures
@@ -86,20 +91,20 @@ public class DaemonProcessTask implements org.quartz.Job {
             List<DetectionLog> logs = new ArrayList<>();
             for (CompletableFuture<HumanDetectionResp> future : futures) {
                 try {
-                    HumanDetectionResp resp = future.get();
-                    String respJsonFmt = objectMapper.writeValueAsString(resp);
-                    log.info("resp:{}", respJsonFmt);
-                    Camera camera = cameraRepository.findById(resp.getCameraId()).orElseThrow();
-                    DetectionLog log = DetectionLog.of(resp);
-                    logs.add(log);
-
-                    for (User user : camera.getUsers())
-                        mail.sendText(user.getEmail(), "TITLE", respJsonFmt, log.getImg());
-
+                    DetectionLog log = DetectionLog.of(future.get());
+                    if (log.getIsHuman()) {
+                        Camera camera = cameraRepository.findById(log.getCameraId()).orElseThrow();
+                        logs.add(log.setCameraLabel(camera.getLabel()));
+                        // send mails
+                        for (User user : camera.getUsers())
+                            mail.send(user, log);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
+            // save logs
+            logRepository.saveAll(logs);
         }
     }
 }

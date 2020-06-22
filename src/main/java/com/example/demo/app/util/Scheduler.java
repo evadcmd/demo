@@ -1,11 +1,17 @@
 package com.example.demo.app.util;
 
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.cronutils.model.CronType;
+import com.cronutils.model.definition.CronDefinitionBuilder;
+import com.cronutils.model.time.ExecutionTime;
+import com.cronutils.parser.CronParser;
 import com.example.demo.app.entity.Task;
 
 import org.quartz.CronScheduleBuilder;
@@ -30,13 +36,26 @@ public class Scheduler {
 
     private void addCronTriggerTask(Task task) throws SchedulerException {
         Trigger trigger = TriggerBuilder.newTrigger()
-            .withIdentity(String.valueOf(0), task.getId().toString())
+            .withIdentity(String.valueOf(1), task.getId().toString())
             .withSchedule(CronScheduleBuilder.cronSchedule(task.getCron()))
             .build();
         JobDetail jobDetail = JobBuilder.newJob(Job.class)
-            .withIdentity(String.valueOf(0), task.getId().toString())
+            .withIdentity(String.valueOf(1), task.getId().toString())
             .usingJobData("id", task.getId())
             .build();
+        scheduler.scheduleJob(jobDetail, trigger);
+    }
+
+    private void addCronPrevSimpleTriggerTask(Task task) throws SchedulerException {
+        Date date = getPrevExecTime(task);
+        Trigger trigger = TriggerBuilder.newTrigger()
+                            .withIdentity(String.valueOf(0), task.getId().toString())
+                            .startAt(date)
+                            .build();
+        JobDetail jobDetail = JobBuilder.newJob(Job.class)
+                                .withIdentity(String.valueOf(0), task.getId().toString())
+                                .usingJobData("id", task.getId())
+                                .build();
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
@@ -55,14 +74,38 @@ public class Scheduler {
         }
     }
 
-    public void activateDaemonProcess() {
+    public void activateDaemonProcess() throws SchedulerException {
+        JobDetail jobDetail = JobBuilder.newJob(DaemonProcessTask.class)
+                                        .withIdentity("daemonprocess", "daemon")
+                                        .build();
+        Trigger trigger = TriggerBuilder.newTrigger()
+                                        .withIdentity("daemonprocess", "daemon")
+                                        .withSchedule(CronScheduleBuilder.cronSchedule("*/5 * * ? * *"))
+                                        .build();
+        scheduler.scheduleJob(jobDetail, trigger);
+    }
 
+    private Date getPrevExecTime(Task cronTask) {
+        if (cronTask.getMode() == Task.Mode.SINGLE_SHOT)
+            throw new RuntimeException("Invalid Task Type");
+
+        CronParser parser = new CronParser(
+            CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ)
+        );
+
+        Optional<ZonedDateTime> lastExecution =
+            ExecutionTime.forCron(parser.parse(cronTask.getCron())).lastExecution(ZonedDateTime.now());
+
+        ZonedDateTime time = lastExecution.get();
+
+        return Date.from(time.toInstant());
     }
 
     public void add(Task task) throws SchedulerException {
         switch (task.getMode()) {
             case WEEK:
             case MONTH:
+                addCronPrevSimpleTriggerTask(task);
                 addCronTriggerTask(task);
                 break;
             case SINGLE_SHOT:
@@ -83,6 +126,7 @@ public class Scheduler {
         scheduler.deleteJobs(jobKeys);
     }
 
+    // cancel partial triggers from task
     public void unschedule(Task task) throws SchedulerException {
         scheduler.unscheduleJobs(
             scheduler
@@ -100,6 +144,11 @@ public class Scheduler {
     public void update(Task task) throws SchedulerException {
         delete(task);
         add(task);
+    }
+
+    public void update(Collection<Task> tasks) throws SchedulerException {
+        for (Task task : tasks)
+            update(task);
     }
 
 }

@@ -1,5 +1,7 @@
 package com.example.demo.auth;
 
+import com.example.demo.auth.util.RSA;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -43,8 +45,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthenticationFailureHandler failureHandler;
 
+    @Autowired
+    private RSA rsa;
+
     protected AuthFilter authFilter() throws Exception {
         AuthFilter authFilter = new AuthFilter();
+        authFilter.setRsa(rsa);
         authFilter.setAuthenticationSuccessHandler(successHandler);
         authFilter.setAuthenticationFailureHandler(failureHandler);
         authFilter.setAuthenticationManager(super.authenticationManagerBean());

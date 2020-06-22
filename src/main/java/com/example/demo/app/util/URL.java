@@ -1,14 +1,12 @@
 package com.example.demo.app.util;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import lombok.Setter;
 
 @Setter
-@PropertySource(value = "classpath:config.properties")
-@ConfigurationProperties
+@ConfigurationProperties(prefix = "aiserver")
 @Component
 public class URL {
     private String ip;

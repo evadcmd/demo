@@ -5,9 +5,11 @@
     <meta charset="UTF-8"/>
     <meta name="viewpoint" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="context-path" th:content="${#httpServletRequest.getContextPath()}">
-    <meta name="_csrf" content="${_csrf.token}"/>
-    <meta name="_csrf_header" content="${_csrf.headerName}"/>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <meta name="rsaPublicKey" th:content="${rsaPublicKey}"/>
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/sweetalert2.min.css}" />
     <link rel="stylesheet" th:href="@{/css/main.css}" />
     <title>springboot demo</title>
 </head>
@@ -15,7 +17,9 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
 
+    <script th:src="@{/js/jsencrypt.min.js}"></script>
     <script th:src="@{/js/sockjs.min.js}"></script>
+    <script th:src="@{/js/sweetalert2.all.min.js}"></script>
     <script th:src="@{/js/bundle.js}"></script>
 </body>
 
